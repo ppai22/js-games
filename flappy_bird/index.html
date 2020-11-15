@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Flappy Bird</title>
+        <style>
+            * {
+                padding: 10;
+                margin: 10;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="myCanvas" width="480" height="320"></canvas>
+        <script>
+            var canvas = document.getElementById("myCanvas");
+            var ctx = canvas.getContext("2d")
+            
+            var x = 30;
+            var y = canvas.height/2;
+            var dx = -2;
+            var dy = 1;
+            var ballRadius = 10;
+            var rectangles = []
+            
+            var rectX = canvas.width/2;
+            var rectY = canvas.height/3;
+            var rectWidth = 20;
+            var rectHeight = canvas.height/2;
+            var rectWidthGap = canvas.width/3;
+            var rectFixedGap = canvas.height/4;
+            
+            var score = 0;
+            
+            document.addEventListener("keyup", goUp, false);
+            document.addEventListener("click", goUp, false);
+            
+            function goUp() {
+                y += -25
+            }
+            
+            function randomInteger() {
+                min = canvas.height/5;
+                max = 2*canvas.height/3;
+                return Math.floor(Math.random() * (max - min)) + min;
+            }
+            
+            rectangles[0] = {
+                x: canvas.width,
+                y: randomInteger()
+            };
+            
+            function drawBall() {
+                ctx.beginPath();
+                ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+                ctx.fillStyle = "red";
+                ctx.fill();
+                ctx.closePath();
+            }
+            
+            function gameOver() {
+                alert("GAME OVER");
+                document.location.reload();
+                clearInterval(interval);
+            }
+            
+            function drawScore() {
+                ctx.font = "16px Arial";
+                ctx.fillStyle = "blue";
+                ctx.fillText("Score: "+score, 8, 20);
+            }
+                
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBall();
+                drawScore();
+                for (var i=0; i<rectangles.length; i++) {
+                    ctx.beginPath();
+                    ctx.rect(rectangles[i].x, 0, 
+                             rectWidth, rectangles[i].y);
+                    ctx.fillStyle = "grey";
+                    ctx.fill();
+                    ctx.closePath();
+                    ctx.beginPath();
+                    ctx.rect(rectangles[i].x, rectangles[i].y+rectFixedGap, 
+                             rectWidth, canvas.height);
+                    ctx.fillStyle = "grey";
+                    ctx.fill();
+                    ctx.closePath();
+                    
+                    rectangles[i].x -= 5;
+                    
+                    if (rectangles[i].x == canvas.width/2) {
+                        rectangles.push(
+                            { x: canvas.width, y: randomInteger()}
+                        );
+                    }
+                    y += dy;
+                    
+                    if (y == canvas.height-ballRadius/2) {
+                        gameOver();
+                    }
+                    else if ((x >= rectangles[i].x &&
+                              x <= rectangles[i].x+rectWidth) &&
+                             (y <= rectangles[i].y || y >= 
+                              rectangles[i].y+rectFixedGap)) {
+                        gameOver();
+                    }
+                    if ((x == rectangles[i].x+rectWidth) && 
+                        (y > rectangles[i].y && 
+                         y < rectangles[i].y+rectFixedGap)) {
+                        score++;
+                    }
+                }
+            }
+            var interval = setInterval(draw, 50);
+        </script>
+    </body>
+</html>
