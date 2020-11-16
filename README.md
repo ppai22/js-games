@@ -3,3 +3,4 @@ Games built using Javascript. (Not complete...)
 
 - Bricks
 - Flappy Bird
+- Snake
